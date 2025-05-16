@@ -1,7 +1,8 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import HomePage from "../pages/secure-pages/home/HomePage";
 import LoginPage from "../pages/auth-pages/LoginPage";
 import AppLayout from "../layout/AppLayout";
+import homeRoutes from "./home-routes";
 
 const router = createBrowserRouter([
 	{
@@ -13,19 +14,14 @@ const router = createBrowserRouter([
 		element: <LoginPage />,
 	},
 	{
-		path: "/home",
+		path: "/",
 		element: (
 			<AppLayout>
-				<HomePage />
+				<Outlet />
 			</AppLayout>
 		),
-		// children: [
-		//     {
-		//         path: "/courses",
-		//         element: <div>Hello</div>
-		//     }
-		// ]
+		children: homeRoutes,
 	},
 ]);
 
-export default router
+export default router;
