@@ -114,7 +114,7 @@ function AppLayout({
 	}, []);
 
 	return (
-		<div className="flex flex-col min-h-screen bg-gray-50">
+		<div className="flex flex-col min-h-screen w-screen">
 			<Header
 				sidebarOpen={sidebarOpen}
 				toggleSidebar={toggleSidebar}

@@ -24,12 +24,11 @@ const Sidebar = React.memo(
 		// onItemClick: (r: string) => void;
 	}) => (
 		<aside
-			style={{ backgroundColor: themeColors.surfaces.sidebar }}
-			className={` w-64 min-h-screen pt-20 flex-shrink-0 transition-all duration-300 fixed ${
-				open ? "left-0" : "-left-full"
-			} lg:left-0`}
+			className={`${
+				open ? "w-64" : "w-0"
+			} bg-white fixed h-full shadow-md transition-all duration-300 overflow-hidden flex-shrink-0`}
 		>
-			<div className="p-4 text-center">
+			<div className="p-4 text-center h-fill">
 				<div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
 					<span className="text-2xl font-bold">{userInitials}</span>
 				</div>

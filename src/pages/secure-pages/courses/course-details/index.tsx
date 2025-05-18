@@ -1,13 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from 'react'
-import { 
-  ChevronDown, ChevronRight, MoreHorizontal, 
-  FolderOpen, File, FileText, Video, Download,
-  Calendar, Book, ClipboardList, Award, Users, Bell,
-  CheckCircle, Clock, AlertCircle, FilePlus, Plus
-} from 'lucide-react';
-import { useParams } from 'react-router-dom';
-import { themeColors } from '../../../../constant/Colors';
+import { useState } from "react";
+import {
+	ChevronDown,
+	ChevronRight,
+	MoreHorizontal,
+	FolderOpen,
+	File,
+	FileText,
+	Video,
+	Download,
+	Book,
+	ClipboardList,
+	Award,
+	Users,
+	Bell,
+	CheckCircle,
+	Clock,
+	AlertCircle,
+	FilePlus,
+	Plus,
+} from "lucide-react";
+import { useParams } from "react-router-dom";
+import { themeColors } from "../../../../constant/Colors";
 import AssignmentCard from "../../../../components/cards/assingment-card";
 
 export default function CourseDetails() {
@@ -147,7 +161,6 @@ export default function CourseDetails() {
 		},
 	];
 
-	// Grade Book tab data
 	const grades = [
 		{
 			category: "Assignments",
@@ -181,7 +194,6 @@ export default function CourseDetails() {
 		},
 	];
 
-	// Course Group tab data
 	const groups = [
 		{
 			id: 1,
@@ -873,7 +885,7 @@ export default function CourseDetails() {
 	};
 
 	return (
-		<div className="flex flex-col h-screen bg-gray-100">
+		<div className="flex flex-col h-screen">
 			{/* Course Header */}
 			<div className="bg-white p-4 border-b">
 				<div className="flex justify-between items-center">
@@ -914,7 +926,7 @@ export default function CourseDetails() {
 			</div>
 
 			{/* Content Area */}
-			<div className="flex-1 w-[80dvw] pb-24">{renderTabContent()}</div>
+			<div className="flex-1 pb-24 w-full">{renderTabContent()}</div>
 		</div>
 	);
 }

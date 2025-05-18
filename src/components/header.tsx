@@ -29,7 +29,7 @@ const Header = React.memo(
 				backgroundColor: themeColors.accents.hover,
 				color: themeColors.primary.main,
 			}}
-			className="shadow-md fixed w-full z-10"
+			className="shadow-sm fixed w-full z-10"
 		>
 			<div className="container flex items-center justify-between p-4">
 				<div className="flex items-center">

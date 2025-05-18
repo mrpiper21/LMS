@@ -88,10 +88,7 @@ export default function CoursesDashboard() {
 	};
 
 	return (
-		<div
-			className="bg-white p-6 min-h-screen space-y-8"
-			onClick={handleDocumentClick}
-		>
+		<div className="bg-white p-6 space-y-8" onClick={handleDocumentClick}>
 			{Object.keys(courseData).map((year) => (
 				<div key={year} className="space-y-6">
 					{/* Year Header with toggle */}
