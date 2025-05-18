@@ -35,7 +35,8 @@ const dropdownOptions = [
 	"Test and Quizzes",
 	"Grade Book",
 	"Calendar",
-	"Course Groups",
+	"Time Table",
+	"Announcements",
 ];
 
 export default function CoursesDashboard() {

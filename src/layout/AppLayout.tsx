@@ -4,7 +4,7 @@ import Header from "../components/header";
 import Sidebar from "../components/sidebar";
 import MainContent from "../components/mainContent";
 import Footer from "../components/footer";
-import { FolderOpen } from "lucide-react";
+import { FolderClosed, FolderOpen } from "lucide-react";
 
 // Type definitions
 export type NavItem = {
@@ -39,17 +39,23 @@ function AppLayout({
 	const navigate = useNavigate();
 
 	// Navigation configuration
-	const navItems: NavItem[] = [
+	const navItems = (activeTab: string) => [
 		{
-			id: "dashboard",
-			label: "Home",
-			icon: <FolderOpen />,
+			id: "overview",
+			label: "Overview",
+			icon: activeTab === "overview" ? <FolderOpen /> : <FolderClosed />,
+			route: "/overview",
+		},
+		{
+			id: "announcement",
+			label: "Announcements",
+			icon: activeTab === "announcement" ? <FolderOpen /> : <FolderClosed />,
 			route: "/home",
 		},
 		{
 			id: "course",
 			label: "Courses",
-			icon: <FolderOpen />,
+			icon: activeTab === "course" ? <FolderOpen /> : <FolderClosed />,
 			route: "/courses",
 		},
 		// {
@@ -124,7 +130,7 @@ function AppLayout({
 			<div className="flex flex-1 overflow-hidden">
 				<Sidebar
 					open={sidebarOpen}
-					navItems={navItems}
+					navItems={navItems(activeTab)}
 					activeTab={activeTab}
 					// onItemClick={handleNavigation}
 					// userInitials={user.initials}

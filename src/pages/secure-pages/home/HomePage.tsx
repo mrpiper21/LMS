@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-	Clock,
-	Calendar,
-	AlertCircle,
-	Bell,
-	ClipboardList,
-	AlertTriangle,
-} from "lucide-react";
+import { Clock, Calendar, ClipboardList, AlertTriangle } from "lucide-react";
 import { themeColors } from "../../../constant/Colors";
 
 export default function HomePage() {
@@ -71,9 +64,6 @@ export default function HomePage() {
 			className="min-h-screen"
 			style={{ backgroundColor: themeColors.surfaces.background }}
 		>
-			{/* Top Navigation */}
-
-			{/* Main Content */}
 			<div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
 				{/* Upcoming Deadlines Section */}
 				<section>

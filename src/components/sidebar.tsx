@@ -40,16 +40,18 @@ const Sidebar = React.memo(
 			<nav className="mt-2">
 				{navItems.map((item) => (
 					<button
+						style={{
+							background:
+								activeTab === item.id ? themeColors.accents.hover : "none",
+
+							color: themeColors.primary.main,
+						}}
 						key={item.id}
 						onClick={() => {
 							setActiveTab(item.id);
 							navigate(item.route);
 						}}
-						className={`flex items-center w-full gap-4 px-4 py-3 text-left transition-colors text-primary-main ${
-							activeTab === item.id
-								? "bg-primary-dark"
-								: "hover:bg-primary-dark"
-						}`}
+						className={`flex items-center w-full gap-4 px-4 py-3 text-left transition-colors`}
 					>
 						<div>{React.cloneElement(item.icon)}</div>
 						<span>{item.label}</span>

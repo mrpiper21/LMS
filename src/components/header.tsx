@@ -63,12 +63,17 @@ const Header = React.memo(
 						</button>
 
 						{showDropdown && (
-							<div className="absolute right-0 mt-2 w-48 rounded-md border bg-[#134B70] py-1 z-[9999999]">
-								<div className="px-4 py-3 border-b text-white">
-									<p className="text-sm font-medium text-white">{username}</p>
+							<div className="absolute right-0 mt-2 w-48 rounded-md border bg-[#F7C966] py-1 z-[9999999]">
+								<div className="px-4 py-3 border-b text-[#134B70]">
+									<p className="text-sm font-medium text-[#134B70]">
+										{username}
+									</p>
 									<p className="text-xs text-gray-500">
 										ID: STU2023{Math.floor(1000 + Math.random() * 9000)}
 									</p>
+								</div>
+								<div className="px-4 py-3 border-b text-[#134B70]">
+									<p>Preference</p>
 								</div>
 								<button
 									onClick={onLogout}
