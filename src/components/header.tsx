@@ -1,6 +1,7 @@
 import { Bell, Menu, X } from "lucide-react";
 import React from "react";
 import { themeColors } from "../constant/Colors";
+import Logo from "../assets/ATU-LOGO-AUTHENTIC-edit-1024x980.png";
 
 const Header = React.memo(
 	({
@@ -40,7 +41,10 @@ const Header = React.memo(
 					>
 						{sidebarOpen ? <X size={24} /> : <Menu size={24} />}
 					</button>
-					<h1 className="text-2xl font-bold">ACCRA TECHNICAL UNIVERSITY</h1>
+					<div className="flex items-center gap-4">
+						<img className="h-12 w-12" src={Logo} />
+						<h1 className="text-lg font-bold">ACCRA TECHNICAL UNIVERSITY</h1>
+					</div>
 				</div>
 
 				<div className="flex items-center gap-4">
@@ -54,13 +58,13 @@ const Header = React.memo(
 					</button>
 
 					<div className="relative" ref={dropdownRef}>
-						<button
+						<div
 							onClick={() => setShowDropdown(!showDropdown)}
-							className="w-10 h-10 bg-white text-primary rounded-full font-bold hover:bg-gray-100 transition-colors"
+							className="w-10 h-10 items-center justify-center flex text-primary border rounded-full border-[#134B70] font-bold hover:cursor-pointer transition-colors"
 							aria-label="User menu"
 						>
-							{userInitials}
-						</button>
+							<span>{"JD"}</span>
+						</div>
 
 						{showDropdown && (
 							<div className="absolute right-0 mt-2 w-48 rounded-md border bg-[#F7C966] py-1 z-[9999999]">
