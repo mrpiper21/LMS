@@ -58,6 +58,12 @@ function AppLayout({
 			icon: activeTab === "course" ? <FolderOpen /> : <FolderClosed />,
 			route: "/courses",
 		},
+		{
+			id: "account",
+			label: "Account",
+			icon: activeTab === "course" ? <FolderOpen /> : <FolderClosed />,
+			route: "/Account",
+		},
 		// {
 		// 	id: "notices",
 		// 	label: "Notice Board",

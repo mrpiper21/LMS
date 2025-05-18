@@ -1,3 +1,4 @@
+import AccountPage from "../pages/secure-pages/account";
 import CourseManagement from "../pages/secure-pages/courses";
 import CourseDetails from "../pages/secure-pages/courses/course-details";
 import HomePage from "../pages/secure-pages/home/HomePage";
@@ -17,9 +18,13 @@ const homeRoutes = [
 		element: <CourseManagement />,
 	},
 	{
+		path: "account",
+		element: <AccountPage />,
+	},
+	{
 		path: "courses/:id",
 		element: <CourseDetails />,
 	},
 ];
 
-export default homeRoutes
+export default homeRoutes;
