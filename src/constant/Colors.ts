@@ -9,7 +9,7 @@ const THEMECOLORS = {
   },
   surfaces: {
     navBar: "#E7BD62",
-    sidebar: "#FFF8E7",
+    sidebar: "#FFF8E7",  // Sidebar background
     card: "#FCFBFA",     // Cards/modals
     background: "#FDFAF5" // Main app background
   },
