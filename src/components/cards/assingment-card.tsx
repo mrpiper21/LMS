@@ -9,8 +9,26 @@ import {
 	Search,
 	AlertTriangle,
 	Shield,
+	FileText,
+	File,
+	Loader2,
 } from "lucide-react";
-import { type FC } from "react";
+import { type FC, useRef, useState } from "react";
+import { themeColors } from "../../constant/Colors";
+
+interface PlagiarismResult {
+	plagPercent: number;
+	uniquePercent: number;
+	details: Array<{
+		query: string;
+		error: number;
+		unique: string;
+		webs?: Array<{
+			title: string;
+			url: string;
+		}>;
+	}>;
+}
 
 interface Assignment {
 	id: string;
@@ -37,13 +55,24 @@ interface AssignmentCardProps {
 	assignment: Assignment;
 	onUpdateStatus?: (id: string, newStatus: Assignment["status"]) => void;
 	onRunInspector?: (id: string) => void;
+	onFileUpload?: (id: string, file: File) => void;
 }
+
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+const PLAGIARISM_API = 'https://pro.smallseotools.com/api/checkplag';
 
 const AssignmentCard: FC<AssignmentCardProps> = ({
 	assignment,
 	onUpdateStatus,
 	onRunInspector,
+	onFileUpload,
 }) => {
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+	const [isChecking, setIsChecking] = useState(false);
+	const [plagiarismResult, setPlagiarismResult] = useState<PlagiarismResult | null>(null);
+	const [error, setError] = useState<string | null>(null);
+
 	// Function to get appropriate status icon
 	const getStatusIcon = (status: string) => {
 		switch (status) {
@@ -255,6 +284,169 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 		return null;
 	};
 
+	const checkPlagiarism = async (content: string) => {
+		try {
+			setIsChecking(true);
+			setError(null);
+
+			// Initial API call
+			const response = await fetch(`${CORS_PROXY}${PLAGIARISM_API}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+					'Origin': window.location.origin,
+					'X-Requested-With': 'XMLHttpRequest'
+				},
+				body: new URLSearchParams({
+					token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
+					data: content,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error(`API request failed with status ${response.status}`);
+			}
+
+			const initialData = await response.json();
+			if (!initialData.recall) {
+				throw new Error('Invalid response from plagiarism API');
+			}
+
+			// Poll for results
+			let currentKey = initialData.key;
+			let hash = initialData.hash;
+			let finalResult = null;
+
+			while (true) {
+				const pollResponse = await fetch(
+					`${CORS_PROXY}https://pro.smallseotools.com/api/query-footprint/${hash}/${currentKey}`,
+					{
+						headers: {
+							'Origin': window.location.origin,
+							'X-Requested-With': 'XMLHttpRequest'
+						}
+					}
+				);
+
+				if (!pollResponse.ok) {
+					throw new Error(`Poll request failed with status ${pollResponse.status}`);
+				}
+
+				const pollData = await pollResponse.json();
+
+				if (!pollData.recall) {
+					finalResult = pollData;
+					break;
+				}
+
+				currentKey = pollData.key;
+				// Wait for 2 seconds before next poll
+				await new Promise(resolve => setTimeout(resolve, 2000));
+			}
+
+			setPlagiarismResult(finalResult);
+			updateInspectorStatus(finalResult.plagPercent);
+		} catch (error) {
+			console.error('Plagiarism check failed:', error);
+			setError(error instanceof Error ? error.message : 'Failed to check plagiarism');
+		} finally {
+			setIsChecking(false);
+		}
+	};
+
+	const updateInspectorStatus = (plagPercent: number) => {
+		if (plagPercent > 20) {
+			// Update assignment status to show issues found
+			if (onUpdateStatus) {
+				onUpdateStatus(assignment.id, "Returned");
+			}
+		}
+	};
+
+	const extractTextFromPDF = async (file: File): Promise<string> => {
+		try {
+			// For now, we'll just return a placeholder message
+			// In a real implementation, you would use a PDF parsing library
+			return "PDF content extraction is not implemented yet. Please convert your PDF to text format before uploading.";
+		} catch (error) {
+			throw new Error("Failed to extract text from PDF");
+		}
+	};
+
+	const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (file) {
+			setUploadedFile(file);
+			if (onFileUpload) {
+				onFileUpload(assignment.id, file);
+			}
+
+			try {
+				setError(null);
+				let content: string;
+
+				if (file.type === 'application/pdf') {
+					content = await extractTextFromPDF(file);
+					setError("PDF files are not supported for plagiarism checking. Please convert to text format.");
+					return;
+				} else if (file.type === 'application/msword' ||
+					file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+					// For Word documents, we'll need to implement proper text extraction
+					content = "Word document content extraction is not implemented yet. Please convert to text format before uploading.";
+					setError("Word documents are not supported for plagiarism checking. Please convert to text format.");
+					return;
+				} else {
+					// For text files
+					content = await new Promise((resolve, reject) => {
+						const reader = new FileReader();
+						reader.onload = (e) => {
+							const text = e.target?.result as string;
+							if (text) {
+								resolve(text);
+							} else {
+								reject(new Error("Failed to read file content"));
+							}
+						};
+						reader.onerror = () => reject(new Error("Failed to read file"));
+						reader.readAsText(file);
+					});
+				}
+
+				if (content) {
+					await checkPlagiarism(content);
+				}
+			} catch (error) {
+				console.error('File processing failed:', error);
+				setError(error instanceof Error ? error.message : 'Failed to process file');
+			}
+		}
+	};
+
+	const handleUploadClick = () => {
+		fileInputRef.current?.click();
+	};
+
+	const getFileIcon = (file: File) => {
+		const extension = file.name.split('.').pop()?.toLowerCase();
+		switch (extension) {
+			case 'pdf':
+				return <FileText size={16} className="text-red-500" />;
+			case 'doc':
+			case 'docx':
+				return <FileText size={16} className="text-blue-500" />;
+			default:
+				return <File size={16} className="text-gray-500" />;
+		}
+	};
+
+	const formatFileSize = (bytes: number) => {
+		if (bytes === 0) return '0 Bytes';
+		const k = 1024;
+		const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+		const i = Math.floor(Math.log(bytes) / Math.log(k));
+		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+	};
+
 	return (
 		<div className="border rounded-lg mb-4 hover:shadow-md transition-shadow">
 			<div className="p-4 border-b">
@@ -408,39 +600,112 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 					</div>
 				)}
 
-				<div className="mt-4 flex justify-end space-x-2">
-					{(assignment.status === "In Progress" ||
-						assignment.status === "Due") && (
-						<>
+				<div className="mt-4 flex justify-between">
+					<div>
+						<div className="flex items-center space-x-2">
+							<span className="text-gray-600">File:</span>
+							{uploadedFile ? (
+								<div className="flex items-center space-x-2 bg-gray-50 px-3 py-1.5 rounded border">
+									{getFileIcon(uploadedFile)}
+									<div className="flex flex-col">
+										<span className="text-sm font-medium text-gray-700">
+											{uploadedFile.name}
+										</span>
+										<span className="text-xs text-gray-500">
+											{formatFileSize(uploadedFile.size)}
+										</span>
+										{error && (
+											<span className="text-xs text-red-500 mt-1">
+												{error}
+											</span>
+										)}
+									</div>
+								</div>
+							) : (
+								<div className="flex items-center space-x-2">
+									<input
+										type="file"
+										ref={fileInputRef}
+										onChange={handleFileUpload}
+										accept=".txt,.text"
+										className="block w-full text-sm text-gray-500
+											file:mr-4 file:py-2 file:px-4
+											file:rounded file:border-0
+											file:text-sm file:font-semibold
+											file:bg-blue-50 file:text-blue-700
+											hover:file:bg-blue-100"
+									/>
+								</div>
+							)}
+						</div>
+						<div className="flex items-center space-x-2 mt-1">
+							<span className="text-gray-600">Inspector result:</span>
+							{isChecking ? (
+								<div className="flex items-center space-x-2">
+									<Loader2 size={16} className="animate-spin text-blue-600" />
+									<span className="text-sm text-blue-600">Checking for plagiarism...</span>
+								</div>
+							) : error ? (
+								<div className="flex items-center space-x-2">
+									<AlertCircle size={16} className="text-red-500" />
+									<span className="text-sm text-red-600">{error}</span>
+								</div>
+							) : plagiarismResult ? (
+								<div className="flex items-center space-x-2">
+									<span className={`text-sm font-medium ${plagiarismResult.plagPercent > 20 ? 'text-red-600' : 'text-green-600'
+										}`}>
+										{plagiarismResult.plagPercent}% Similar
+									</span>
+									<span className="text-sm text-gray-600">
+										({plagiarismResult.uniquePercent}% Unique)
+									</span>
+								</div>
+							) : (
+								<span className="text-sm text-gray-500">Not checked</span>
+							)}
+						</div>
+					</div>
+					<div className="flex items-center space-x-2">
+						{(assignment.status === "In Progress" ||
+							assignment.status === "Due") && (
+								<>
+									<button
+										className="border border-gray-300 bg-white px-4 py-2 rounded text-sm hover:bg-gray-50 flex items-center"
+										onClick={() => runInspector(assignment.id)}
+									disabled={isChecking}
+								>
+									{isChecking ? (
+										<Loader2 size={16} className="animate-spin mr-2" />
+									) : (
+											<Search size={16} className="mr-2" />
+									)}
+									Run Plagiarism Check
+								</button>
+								<button
+										style={{ backgroundColor: themeColors.accents.active }}
+										className="text-white px-4 py-2 rounded text-sm flex items-center hover:opacity-90 transition-opacity"
+										onClick={handleUploadClick}
+										disabled={isChecking}
+									>
+										<FilePlus size={16} className="mr-2" />
+										Submit Assignment
+									</button>
+								</>
+							)}
+						{assignment.status === "Submitted" && (
 							<button
-								className="border border-gray-300 bg-white px-4 py-2 rounded text-sm hover:bg-gray-50 flex items-center"
-								onClick={() => runInspector(assignment.id)}
+								className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center"
+								onClick={() => updateStatus(assignment.id, "In Progress")}
 							>
-								<Search size={16} className="mr-2" />
-								Run Plagiarism Check
+								<RefreshCcw size={16} className="mr-2" />
+								Resubmit
 							</button>
-							<button
-								className="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex items-center"
-								onClick={() => updateStatus(assignment.id, "Submitted")}
-							>
-								<FilePlus size={16} className="mr-2" />
-								Submit Assignment
-							</button>
-						</>
-					)}
-					{assignment.status === "Submitted" && (
-						<button
-							className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center"
-							onClick={() => updateStatus(assignment.id, "In Progress")}
-						>
-							<RefreshCcw size={16} className="mr-2" />
-							Resubmit
+						)}
+						<button className="border border-gray-300 px-4 py-2 rounded text-sm hover:bg-gray-100 flex items-center">
+							<MoreHorizontal size={16} className="mr-2" />
+							Details
 						</button>
-					)}
-					<button className="border border-gray-300 px-4 py-2 rounded text-sm hover:bg-gray-100 flex items-center">
-						<MoreHorizontal size={16} className="mr-2" />
-						Details
-					</button>
+					</div>
 				</div>
 			</div>
 		</div>
