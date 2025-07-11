@@ -4,15 +4,15 @@ import { User, Mail, BookOpen, Calendar, CreditCard, Shield } from "lucide-react
 const AccountPage = () => {
   // Mock student data
   const student = {
-    name: "Alex Johnson",
-    email: "alex.johnson@university.edu",
-    studentId: "STU-2023-8452",
-    program: "Bachelor of Business Administration",
-    enrollmentDate: "September 2023",
-    expectedGraduation: "May 2027",
+    name: "John Doe",
+    email: "jdoe024@atu.edu.gh",
+    studentId: "01223699d",
+    program: "HND Accountancy",
+    enrollmentDate: "January 2023",
+    expectedGraduation: "September 2025",
     status: "Active",
-    contactNumber: "+1 (555) 123-4567",
-    address: "123 Campus Ave, Apt 4B, University City, 10001"
+    contactNumber: "0277146228",
+    address: "P. O Box GP 561, Barnes road, Accra"
   };
 
   const academicStats = [

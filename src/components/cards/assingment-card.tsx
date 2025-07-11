@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { type FC, useRef, useState } from "react";
 import { themeColors } from "../../constant/Colors";
+import axios from "axios";
 
 interface PlagiarismResult {
 	plagPercent: number;
@@ -72,6 +73,14 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 	const [isChecking, setIsChecking] = useState(false);
 	const [plagiarismResult, setPlagiarismResult] = useState<PlagiarismResult | null>(null);
 	const [error, setError] = useState<string | null>(null);
+
+	
+
+	const myHeaders = new Headers()
+	myHeaders.append("ApiKey","586e9af1-81ed-4b39-a051-16c46dcff294");
+
+	
+	
 
 	// Function to get appropriate status icon
 	const getStatusIcon = (status: string) => {
@@ -289,63 +298,27 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 			setIsChecking(true);
 			setError(null);
 
-			// Initial API call
-			const response = await fetch(`${CORS_PROXY}${PLAGIARISM_API}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-					'Origin': window.location.origin,
-					'X-Requested-With': 'XMLHttpRequest'
-				},
-				body: new URLSearchParams({
-					token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30',
-					data: content,
-				}),
-			});
+			const formdata = new FormData();
+			formdata.append("file", content);
 
-			if (!response.ok) {
-				throw new Error(`API request failed with status ${response.status}`);
+			const requestOptions = {
+					method: 'POST',
+					headers: myHeaders,
+					body: formdata,
+					redirect: 'follow'
+				};
+
+
+			const response = await axios.post("https://api.zerogpt.com/api/detect/detectFile", formdata, {
+				headers: myHeaders,
+			})
+
+			if(response.status === 200){
+				console.log("Plagiarism check initiated successfully.", response.data);
 			}
+			
 
-			const initialData = await response.json();
-			if (!initialData.recall) {
-				throw new Error('Invalid response from plagiarism API');
-			}
-
-			// Poll for results
-			let currentKey = initialData.key;
-			let hash = initialData.hash;
-			let finalResult = null;
-
-			while (true) {
-				const pollResponse = await fetch(
-					`${CORS_PROXY}https://pro.smallseotools.com/api/query-footprint/${hash}/${currentKey}`,
-					{
-						headers: {
-							'Origin': window.location.origin,
-							'X-Requested-With': 'XMLHttpRequest'
-						}
-					}
-				);
-
-				if (!pollResponse.ok) {
-					throw new Error(`Poll request failed with status ${pollResponse.status}`);
-				}
-
-				const pollData = await pollResponse.json();
-
-				if (!pollData.recall) {
-					finalResult = pollData;
-					break;
-				}
-
-				currentKey = pollData.key;
-				// Wait for 2 seconds before next poll
-				await new Promise(resolve => setTimeout(resolve, 2000));
-			}
-
-			setPlagiarismResult(finalResult);
-			updateInspectorStatus(finalResult.plagPercent);
+			// setPlagiaris 	
 		} catch (error) {
 			console.error('Plagiarism check failed:', error);
 			setError(error instanceof Error ? error.message : 'Failed to check plagiarism');
@@ -354,21 +327,21 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 		}
 	};
 
-	const updateInspectorStatus = (plagPercent: number) => {
-		if (plagPercent > 20) {
-			// Update assignment status to show issues found
-			if (onUpdateStatus) {
-				onUpdateStatus(assignment.id, "Returned");
-			}
-		}
-	};
+	// const updateInspectorStatus = (plagPercent: number) => {
+	// 	if (plagPercent > 20) {
+	// 		// Update assignment status to show issues found
+	// 		if (onUpdateStatus) {
+	// 			onUpdateStatus(assignment.id, "Returned");
+	// 		}
+	// 	}
+	// };
 
 	const extractTextFromPDF = async (file: File): Promise<string> => {
 		try {
 			// For now, we'll just return a placeholder message
 			// In a real implementation, you would use a PDF parsing library
 			return "PDF content extraction is not implemented yet. Please convert your PDF to text format before uploading.";
-		} catch (error) {
+		} catch (error: any) {
 			throw new Error("Failed to extract text from PDF");
 		}
 	};
@@ -386,7 +359,7 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 				let content: string;
 
 				if (file.type === 'application/pdf') {
-					content = await extractTextFromPDF(file);
+					content = file as any;
 					setError("PDF files are not supported for plagiarism checking. Please convert to text format.");
 					return;
 				} else if (file.type === 'application/msword' ||
@@ -639,7 +612,7 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 							)}
 						</div>
 						<div className="flex items-center space-x-2 mt-1">
-							<span className="text-gray-600">Inspector result:</span>
+							<span className="text-gray-600">+</span>
 							{isChecking ? (
 								<div className="flex items-center space-x-2">
 									<Loader2 size={16} className="animate-spin text-blue-600" />

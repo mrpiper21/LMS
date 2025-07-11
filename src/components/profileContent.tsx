@@ -5,7 +5,7 @@ const ProfileContent = ({ initials }: { initials: string }) => (
     </div>
     <div>
       <h3 className="text-xl font-semibold">John Doe</h3>
-      <p className="text-gray-600">student@atu.edu.gh</p>
+      <p className="text-gray-600">jdoe423@atu.edu.gh</p>
     </div>
   </div>
 );
