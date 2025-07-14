@@ -1,0 +1,221 @@
+/* Browser-specific fixes for Edge and Chrome */
+
+/* Edge-specific fixes */
+.browser-edge .flex {
+  display: -ms-flexbox !important;
+}
+
+.browser-edge .flex-col {
+  -ms-flex-direction: column !important;
+}
+
+.browser-edge .items-center {
+  -ms-flex-align: center !important;
+}
+
+.browser-edge .justify-center {
+  -ms-flex-pack: center !important;
+}
+
+.browser-edge .justify-between {
+  -ms-flex-pack: justify !important;
+}
+
+.browser-edge .grid {
+  display: -ms-grid !important;
+}
+
+.browser-edge button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.browser-edge input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* Chrome-specific fixes */
+.browser-chrome .flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.browser-chrome button:focus {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
+}
+
+.browser-chrome input:focus {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
+}
+
+/* Fix for Chrome text rendering */
+.browser-chrome body {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fix for Edge text rendering */
+.browser-edge body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Fix for flexbox gap support in older browsers */
+.flex-gap-1 > * + * {
+  margin-left: 0.25rem;
+}
+
+.flex-gap-2 > * + * {
+  margin-left: 0.5rem;
+}
+
+.flex-gap-4 > * + * {
+  margin-left: 1rem;
+}
+
+.flex-gap-6 > * + * {
+  margin-left: 1.5rem;
+}
+
+/* Fix for CSS Grid gap support in older browsers */
+.grid-gap-1 > * {
+  margin: 0.125rem;
+}
+
+.grid-gap-2 > * {
+  margin: 0.25rem;
+}
+
+.grid-gap-4 > * {
+  margin: 0.5rem;
+}
+
+/* Fix for backdrop-filter support */
+@supports not (backdrop-filter: blur(10px)) {
+  .backdrop-blur {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Fix for CSS custom properties in older browsers */
+@supports not (--custom: property) {
+  .text-primary {
+    color: #134B70 !important;
+  }
+  
+  .text-secondary {
+    color: rgba(19, 75, 112, 0.6) !important;
+  }
+  
+  .text-inverted {
+    color: #FCFBFA !important;
+  }
+  
+  .bg-primary {
+    background-color: #134B70 !important;
+  }
+  
+  .bg-accent {
+    background-color: #D09E34 !important;
+  }
+  
+  .bg-surface {
+    background-color: #FCFBFA !important;
+  }
+  
+  .bg-background {
+    background-color: #FDFAF5 !important;
+  }
+}
+
+/* Fix for CSS Grid auto-fit/auto-fill in older browsers */
+@supports not (grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))) {
+  .grid-auto-fit {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .grid-auto-fit > * {
+    flex: 1 1 200px;
+    margin: 0.5rem;
+  }
+}
+
+/* Fix for aspect-ratio in older browsers */
+@supports not (aspect-ratio: 16/9) {
+  .aspect-video {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+  
+  .aspect-video > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Fix for CSS logical properties in older browsers */
+@supports not (margin-inline: auto) {
+  .mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .px-4 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* Fix for CSS container queries in older browsers */
+@supports not (container-type: inline-size) {
+  .container-query {
+    /* Fallback for browsers without container query support */
+    width: 100%;
+  }
+}
+
+/* Fix for CSS scrollbar styling in older browsers */
+@supports not (scrollbar-width: thin) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+/* Fix for CSS focus-visible in older browsers */
+@supports not (selector(:focus-visible)) {
+  button:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 2px solid #646cff;
+    outline-offset: 2px;
+  }
+} 
