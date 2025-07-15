@@ -114,12 +114,12 @@ const AssignmentCard: FC<AssignmentCardProps> = ({
 	};
 
 	// Handle file processing and plagiarism check
-	const handleFileProcess = async (content: string) => {
+	const handleFileProcess = async (file: File) => {
 		try {
 			setIsChecking(true);
 			setError(null);
 
-			const result = await checkPlagiarism(content);
+			const result = await checkPlagiarism(file);
 			setPlagiarismResult(result);
 
 			// Update inspector status based on results

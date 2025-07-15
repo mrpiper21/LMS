@@ -1,61 +1,60 @@
 import axios from 'axios';
 
 // API configuration
-const API_KEY = "586e9af1-81ed-4b39-a051-16c46dcff294";
-const PLAGIARISM_API_URL = "https://api.zerogpt.com/api/detect/detectFile";
+const API_KEY = "0f2c7a3f-6958-4181-8b59-fc4ae622fc94";
+const PLAGIARISM_API_URL = "https://api.zerogpt.com/api/detect/filePlagiarism";
 
 export interface PlagiarismResult {
-  plagPercent: number;
-  uniquePercent: number;
-  details: Array<{
-    query: string;
-    error: number;
-    unique: string;
-    webs?: Array<{
-      title: string;
-      url: string;
-    }>;
-  }>;
+	plagPercent: number;
+	uniquePercent: number;
+	details: Array<{
+		query: string;
+		error: number;
+		unique: string;
+		webs?: Array<{
+			title: string;
+			url: string;
+		}>;
+	}>;
 }
 
-export const checkPlagiarism = async (content: string): Promise<PlagiarismResult> => {
-  try {
-    // Create FormData with the text content
-    const formData = new FormData();
-    
-    // Create a Blob from the text content
-    const textBlob = new Blob([content], { type: 'text/plain' });
-    formData.append("file", textBlob, "document.txt");
+export const checkPlagiarism = async (
+	file: File
+): Promise<PlagiarismResult> => {
+	try {
+		// Create FormData with the file
+		const formData = new FormData();
+		formData.append("file", file, file.name);
 
-    // Prepare headers for the API request
-    const headers = {
-      "ApiKey": API_KEY,
-      "Content-Type": "multipart/form-data",
-    };
+		// Prepare headers for the API request
+		const headers = {
+			ApiKey: API_KEY,
+			// 'Content-Type' should NOT be set manually for FormData
+		};
 
-    // Make the API request
-    const response = await axios.post(PLAGIARISM_API_URL, formData, {
-      headers: headers,
-      timeout: 30000,
-    });
+		// Make the API request
+		const response = await axios.post(PLAGIARISM_API_URL, formData, {
+			headers: headers,
+			timeout: 30000,
+		});
 
-    if (response.status === 200 && response.data) {
-      console.log("Plagiarism check completed successfully.", response.data);
-      return processPlagiarismResponse(response.data);
-    } else {
-      throw new Error("Invalid response from plagiarism API");
-    }
-  } catch (error) {
-    console.error('Plagiarism check failed:', error);
-    throw error;
-  }
+		if (response.status === 200 && response.data) {
+			console.log("Plagiarism check completed successfully.", response.data);
+			return processPlagiarismResponse(response.data);
+		} else {
+			throw new Error("Invalid response from plagiarism API");
+		}
+	} catch (error) {
+		console.error("Plagiarism check failed:", error);
+		throw error;
+	}
 };
 
 // Process the plagiarism API response
 export const processPlagiarismResponse = (data: Record<string, unknown>): PlagiarismResult => {
   try {
     // Extract relevant data from the API response
-    const plagPercent = (data.plagiarism_percentage as number) || (data.similarity_score as number) || 0;
+    const plagPercent = (data.result[15].wordsmatched as number) || (data.similarity_score as number) || 0;
     const uniquePercent = 100 - plagPercent;
     
     const details = (data.details as Array<Record<string, unknown>>) || (data.matches as Array<Record<string, unknown>>) || [];
