@@ -22,17 +22,13 @@ export const checkPlagiarism = async (
 	file: File
 ): Promise<PlagiarismResult> => {
 	try {
-		// Create FormData with the file
 		const formData = new FormData();
 		formData.append("file", file, file.name);
 
-		// Prepare headers for the API request
 		const headers = {
 			ApiKey: API_KEY,
-			// 'Content-Type' should NOT be set manually for FormData
 		};
 
-		// Make the API request
 		const response = await axios.post(PLAGIARISM_API_URL, formData, {
 			headers: headers,
 			timeout: 30000,
@@ -50,34 +46,42 @@ export const checkPlagiarism = async (
 	}
 };
 
-// Process the plagiarism API response
-export const processPlagiarismResponse = (data: Record<string, unknown>): PlagiarismResult => {
-  try {
-    // Extract relevant data from the API response
-    const plagPercent = (data.result[15].wordsmatched as number) || (data.similarity_score as number) || 0;
-    const uniquePercent = 100 - plagPercent;
-    
-    const details = (data.details as Array<Record<string, unknown>>) || (data.matches as Array<Record<string, unknown>>) || [];
-    
-    return {
-      plagPercent: Math.round(plagPercent),
-      uniquePercent: Math.round(uniquePercent),
-      details: details.map((detail: Record<string, unknown>) => ({
-        query: (detail.query as string) || (detail.text as string) || "",
-        error: (detail.error as number) || 0,
-        unique: (detail.unique as string) || "",
-        webs: (detail.webs as Array<{title: string; url: string}>) || (detail.sources as Array<{title: string; url: string}>) || []
-      }))
-    };
-  } catch (error) {
-    console.error('Error processing plagiarism response:', error);
-    // Return a default result if processing fails
-    return {
-      plagPercent: 0,
-      uniquePercent: 100,
-      details: []
-    };
-  }
+export const processPlagiarismResponse = (
+	data: Record<string, unknown>
+): PlagiarismResult => {
+	try {
+		const plagPercent =
+			(data.result[15].wordsmatched as number) ||
+			(data.similarity_score as number) ||
+			0;
+		const uniquePercent = 100 - plagPercent;
+
+		const details =
+			(data.details as Array<Record<string, unknown>>) ||
+			(data.matches as Array<Record<string, unknown>>) ||
+			[];
+
+		return {
+			plagPercent: Math.round(plagPercent),
+			uniquePercent: Math.round(uniquePercent),
+			details: details.map((detail: Record<string, unknown>) => ({
+				query: (detail.query as string) || (detail.text as string) || "",
+				error: (detail.error as number) || 0,
+				unique: (detail.unique as string) || "",
+				webs:
+					(detail.webs as Array<{ title: string; url: string }>) ||
+					(detail.sources as Array<{ title: string; url: string }>) ||
+					[],
+			})),
+		};
+	} catch (error) {
+		console.error("Error processing plagiarism response:", error);
+		return {
+			plagPercent: 0,
+			uniquePercent: 100,
+			details: [],
+		};
+	}
 };
 
 export const getPlagiarismErrorMessage = (error: unknown): string => {
