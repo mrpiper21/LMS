@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import Logo from '../../assets/ATU-LOGO-AUTHENTIC-edit-1024x980.png'
 import { Lock, Unlock } from 'lucide-react'
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const LoginPage = () => {
 	const [showPassword, setShowPassword] = useState(false);
@@ -22,16 +23,16 @@ const LoginPage = () => {
 			console.log("Logged in successfully!");
 			navigate("/home");
 		} else {
-			alert("Please enter both ID and password");
+			toast.warn("Please enter both ID and password");
 		}
 	};
 
-	const handleLogout = () => {
-		setIsLoggedIn(false);
-		setUserId("");
-		setPassword("");
-		console.log("Logged out successfully!");
-	};
+	// const handleLogout = () => {
+	// 	setIsLoggedIn(false);
+	// 	setUserId("");
+	// 	setPassword("");
+	// 	console.log("Logged out successfully!");
+	// };
 
 	return (
 		<section className="min-h-screen w-[100dvw] fex-1 flex items-center justify-center">
@@ -91,7 +92,8 @@ const LoginPage = () => {
 
 						<button
 							type="submit"
-							className="w-full bg-[#134B70] text-white py-3 rounded hover:bg-[#0e3a5d] transition"
+							style={{ backgroundColor: "#E7BD62" }}
+							className="w-full text-white py-3 rounded transition"
 						>
 							Login
 						</button>

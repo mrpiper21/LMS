@@ -5,6 +5,7 @@ import Sidebar from "../components/sidebar";
 import MainContent from "../components/mainContent";
 import Footer from "../components/footer";
 import { FolderClosed, FolderOpen } from "lucide-react";
+import { ToastContainer } from "react-toastify";
 
 // Type definitions
 export type NavItem = {
@@ -99,10 +100,10 @@ function AppLayout({
 
 	const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-	const handleNavigation = (item: NavItem) => {
-		setActiveTab(item.id);
-		navigate?.(item?.route);
-	};
+	// const handleNavigation = (item: NavItem) => {
+	// 	setActiveTab(item.id);
+	// 	navigate?.(item?.route);
+	// };
 
 	// Click outside handler for dropdown
 	useEffect(() => {
@@ -127,7 +128,7 @@ function AppLayout({
 				notificationsCount={notificationsCount}
 				// userInitials={user.initials}
 				username={user.name}
-				dropdownRef={dropdownRef}
+				dropdownRef={dropdownRef as any}
 				showDropdown={showDropdown}
 				setShowDropdown={setShowDropdown}
 				onLogout={handleLogout}
@@ -148,8 +149,8 @@ function AppLayout({
 
 				<MainContent>{children}</MainContent>
 			</div>
-
 			<Footer />
+			<ToastContainer />
 		</div>
 	);
 }
