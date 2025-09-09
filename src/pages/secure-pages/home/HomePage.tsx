@@ -79,11 +79,7 @@ export default function HomePage() {
 		color: themeColors.text.primary,
 	};
 
-	const calendarTileStyles = ({ date }: { date: Date }) => ({
-		color: themeColors.text.primary,
-		backgroundColor:
-			date.getDay() === 0 ? themeColors.accents.hover + "40" : "transparent",
-	});
+	// Removed tileStyle due to type mismatch with react-calendar
 
 	return (
 		<div
@@ -148,7 +144,6 @@ export default function HomePage() {
 							value={calendarDate}
 							onChange={setCalendarDate}
 							tileClassName="hover:bg-opacity-20 transition-colors"
-							tileStyle={calendarTileStyles}
 							navigationLabel={({ label }) => (
 								<span
 									style={{ color: themeColors.text.primary, fontWeight: 600 }}
@@ -315,45 +310,7 @@ export default function HomePage() {
 				</div>
 			</div>
 
-			{/* Quick Action Bar */}
-			<div
-				className="fixed bottom-0 left-0 right-0 p-3 border-t flex justify-center gap-6 backdrop-blur-sm"
-				style={{
-					backgroundColor: themeColors.surfaces.sidebar + "CC",
-					borderColor: themeColors.accents.active,
-				}}
-			>
-				<button
-					className="flex items-center gap-2 px-4 py-2 rounded-full text-sm hover:scale-105 transition-transform"
-					style={{
-						color: themeColors.text.primary,
-						backgroundColor: themeColors.surfaces.card,
-					}}
-				>
-					<CalendarIcon size={16} />
-					Schedule
-				</button>
-				<button
-					className="flex items-center gap-2 px-4 py-2 rounded-full text-sm hover:scale-105 transition-transform"
-					style={{
-						color: themeColors.text.primary,
-						backgroundColor: themeColors.surfaces.card,
-					}}
-				>
-					<ClipboardList size={16} />
-					Submissions
-				</button>
-				<button
-					className="flex items-center gap-2 px-4 py-2 rounded-full text-sm hover:scale-105 transition-transform"
-					style={{
-						color: themeColors.text.primary,
-						backgroundColor: themeColors.surfaces.card,
-					}}
-				>
-					<AlertTriangle size={16} />
-					Exams
-				</button>
-			</div>
+			{/* Quick Action Bar moved to global Footer */}
 		</div>
 	);
 }

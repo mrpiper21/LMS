@@ -149,7 +149,7 @@ function AppLayout({
 				<MainContent>{children}</MainContent>
 			</div>
 
-			{/* <Footer /> */}
+			<Footer />
 		</div>
 	);
 }
